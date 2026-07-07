@@ -173,27 +173,25 @@ document.addEventListener('DOMContentLoaded', () => {
                 this.applyForce(steerSepX * 1.5, steerSepY * 1.5);
             }
 
-            // PREDATOR AVOIDANCE (Scatter when mouse approaches)
+            // MOUSE ATTRACTION (Swarm around the cursor pointer)
             if (mouse.x !== null && mouse.y !== null) {
                 const distToMouse = Math.hypot(this.position.x - mouse.x, this.position.y - mouse.y);
-                if (distToMouse < mouse.radius) {
-                    let escapeX = this.position.x - mouse.x;
-                    let escapeY = this.position.y - mouse.y;
+                // Mouse pull radius
+                if (distToMouse < 400) {
+                    let attractX = mouse.x - this.position.x;
+                    let attractY = mouse.y - this.position.y;
 
-                    // The closer the mouse, the stronger the force
-                    const force = (mouse.radius - distToMouse) / mouse.radius;
-                    const escSpeed = Math.hypot(escapeX, escapeY);
-
-                    if (escSpeed > 0) {
-                        escapeX = (escapeX / escSpeed) * this.maxSpeed * 3; // Sprint speed
-                        escapeY = (escapeY / escSpeed) * this.maxSpeed * 3;
+                    const attractSpeed = Math.hypot(attractX, attractY);
+                    if (attractSpeed > 0) {
+                        attractX = (attractX / attractSpeed) * this.maxSpeed;
+                        attractY = (attractY / attractSpeed) * this.maxSpeed;
                     }
 
-                    let steerEscX = escapeX - this.velocity.x;
-                    let steerEscY = escapeY - this.velocity.y;
+                    let steerAttractX = attractX - this.velocity.x;
+                    let steerAttractY = attractY - this.velocity.y;
 
-                    // Very high weight for survival!
-                    this.applyForce(steerEscX * 4.0 * force, steerEscY * 4.0 * force);
+                    // Apply a gentle pull towards the mouse pointer
+                    this.applyForce(steerAttractX * 0.4, steerAttractY * 0.4);
                 }
             }
         }
